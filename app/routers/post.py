@@ -5,10 +5,13 @@ from .. import models
 from typing import List
 from ..schema import Post, PostRespone
 
-router = APIRouter()
+router = APIRouter(
+    prefix= "/posts",
+    tags=["Post"]
+)
 
 
-@router.get("/posts", response_model=List[PostRespone])
+@router.get("/", response_model=List[PostRespone])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
@@ -17,7 +20,7 @@ def get_posts(db: Session = Depends(get_db)):
 
     return posts
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=PostRespone)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=PostRespone)
 def create_post(post: Post, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
     # new_post = cursor.fetchone()    
@@ -30,7 +33,7 @@ def create_post(post: Post, db: Session = Depends(get_db)):
 
     return new_post
 
-@router.get("/posts/{id}", response_model=PostRespone)
+@router.get("/{id}", response_model=PostRespone)
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""", (id,))
     # post = cursor.fetchone()
@@ -43,7 +46,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     
     return post
 
-@router.delete("/posts/{id}")
+@router.delete("/{id}")
 def delete_post(id: int, status_code = status.HTTP_204_NO_CONTENT, db: Session = Depends(get_db)):
     # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (id,))
     # post = cursor.fetchone()
@@ -59,7 +62,7 @@ def delete_post(id: int, status_code = status.HTTP_204_NO_CONTENT, db: Session =
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.put("/posts/{id}", response_model=PostRespone)
+@router.put("/{id}", response_model=PostRespone)
 def update_post(id: int, post: Post, db: Session = Depends(get_db)):
 
     # cursor.execute("""UPDATE posts 

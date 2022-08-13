@@ -1,19 +1,14 @@
-from typing import Optional, List
-from fastapi import FastAPI, Response, HTTPException, status, Depends 
-from fastapi.params import Body
+from fastapi import FastAPI 
 
-from random import randint, randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 
-from app import utils
 from . import models
 
-from .database import engine, get_db
-from .schema import Post
+from .database import engine
 
-from .routers import post, user
+from .routers import post, user, auth
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -33,5 +28,6 @@ while True:
 
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
