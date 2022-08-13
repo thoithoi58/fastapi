@@ -6,11 +6,14 @@ from random import randint, randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+
+from app import utils
 from . import models
-from .schema import Post, PostRespone
+from .schema import Post, PostRespone, UserCreate, UserResponse
 from .database import engine, get_db
 from sqlalchemy.orm import Session
 from .schema import Post
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -43,11 +46,11 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=PostRespone)
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_post(post: Post, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
     # new_post = cursor.fetchone()    
     # conn.commit()
-    print(post)
+
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
@@ -104,3 +107,17 @@ def update_post(id: int, post: Post, db: Session = Depends(get_db)):
     db.commit()
 
     return post_query.first()
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    
+    #Hash the password
+    hashed_pwd = utils.hash(user.password)
+    user.password = hashed_pwd
+
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
