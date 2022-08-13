@@ -16,10 +16,10 @@ def login(user_info: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     user = db.query(models.User).filter(models.User.email == user_info.username).first()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Not found')
 
     if not utils.verify(user_info.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Wrong pass')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Wrong pass')
 
     access_token = oauth2.create_access_token(data= {"email" : user_info.username})
 
